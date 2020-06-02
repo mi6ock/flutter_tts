@@ -88,6 +88,33 @@ public class SwiftFlutterTtsPlugin: NSObject, FlutterPlugin, AVSpeechSynthesizer
   }
 
   private func speak(text: String) {
+
+    let audioSession = AVAudioSession.sharedInstance()
+       do {
+
+        try! audioSession.setCategory(AVAudioSession.Category.playAndRecord)
+        if #available(iOS 9.0, *) {
+            try audioSession.setMode(AVAudioSession.Mode.spokenAudio)
+        } else {
+            // Fallback on earlier versions
+        }
+      try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
+
+                      let currentRoute = AVAudioSession.sharedInstance().currentRoute
+                          for description in currentRoute.outputs {
+                            if description.portType == AVAudioSession.Port.headphones {
+                                try audioSession.overrideOutputAudioPort(AVAudioSession.PortOverride.none)
+                                  print("headphone plugged in")
+                              } else {
+                                  print("headphone pulled out")
+                                try audioSession.overrideOutputAudioPort(AVAudioSession.PortOverride.speaker)
+                              }
+                      }
+
+  } catch {
+        print("audioSession properties weren't set because of an error.")
+  }
+
     let utterance = AVSpeechUtterance(string: text)
     if self.voice != nil {
       utterance.voice = self.voice!
