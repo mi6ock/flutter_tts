@@ -92,8 +92,15 @@ public class SwiftFlutterTtsPlugin: NSObject, FlutterPlugin, AVSpeechSynthesizer
     if self.voice != nil {
       utterance.voice = self.voice!
     } else {
-      utterance.voice = AVSpeechSynthesisVoice(language: self.language)
+        if #available(iOS 9.0, *) {
+            utterance.voice =  AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.siri_female_ja-JP_compact")
+        } else {
+            // Fallback on earlier versions
+        }
+
+
     }
+    print(utterance.voice)
     utterance.rate = self.rate
     utterance.volume = self.volume
     utterance.pitchMultiplier = self.pitch
